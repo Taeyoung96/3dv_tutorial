@@ -1,3 +1,102 @@
+## How to build 3dv_tutorial repository in Ubuntu 18.04  
+
+### 0. Install Ceres-Solver version 1.14.0  
+
+먼저 [Ceres-solver](https://github.com/ceres-solver/ceres-solver/releases) 페이지에서 버전 `1.14.0`을 `tar.gz`를 클릭하여 다운받습니다.  
+
+터미널에서 경로를 `~$`으로 만들어 놓은 다음,  
+```
+mkdir ceres-solver-1.14.0
+cd ceres-solver-1.14.0
+```  
+
+경로를 `~/ceres-solver-1.14.0$`로 바꾸어 놓은 후, 받아놓은 `tar.gz`를 현재 경로로 옮겨놓습니다.  
+
+다음 터미널 창에 차례대로 command를 입력합니다.  
+
+```
+tar zxf ceres-solver-1.14.0.tar.gz
+mkdir ceres-bin
+cd ceres-bin
+cmake ../ceres-solver-1.14.0 -DCMAKE_INSTALL_PREFIX=~/ceres-solver-1.14.0
+make -j3
+make test
+make install
+```
+
+이제 Ceres-solver를 다운받았습니다.  
+
+
+### 1. Required Libraries  
+
+|Library|Version|  
+|:---:|:---:|  
+|OpenCV|3.4.5|
+|Ceres-solver|1.14.0|
+|CMake|3.15.6|  
+
+Ceres-solver는 버전 2가 넘어가면 안된다는 Issue가 있었습니다.  
+
+
+### Build this repository  
+
+필요한 라이브러리를 다 받으면 이 repository에 있는 `CMakeLists.txt`를 다음과 같이 수정해주어야 합니다.  
+
+먼저 `3dv_tutorial` 폴더 안으로 들어가, `CMakeLists.txt`를 클릭하고 수정해주세요.  
+
+```cmake
+cmake_minimum_required(VERSION 2.6)
+
+project(3dv_tutorial)
+set(CMAKE_CXX_STANDARD 11)
+set(CMAKE_BUILD_TYPE Release)
+find_package(OpenCV REQUIRED)
+find_package(Ceres REQUIRED)
+
+include_directories( 
+    ${OpenCV_INCLUDE_DIRS} 
+    ${CERES_INCLUDE_DIRS}
+)
+
+set(SRC_DIR	"${CMAKE_SOURCE_DIR}/src")
+set(BIN_DIR	"${CMAKE_SOURCE_DIR}/bin")
+
+file(GLOB APP_SOURCES "${SRC_DIR}/*.cpp")
+foreach(app_source ${APP_SOURCES})
+    string(REPLACE ".cpp" "" app_name ${app_source})
+    string(REPLACE "${SRC_DIR}/" "" app_name ${app_name})
+    add_executable(${app_name} ${app_source})
+    target_link_libraries(${app_name} ${OpenCV_LIBS} ${CERES_LIBRARIES})
+    install(TARGETS ${app_name} DESTINATION ${BIN_DIR})
+endforeach(app_source ${APP_SOURCES})
+```  
+
+참고 Issue : [Issue #6](https://github.com/sunglok/3dv_tutorial/issues/6)  
+
+다음 빌드를 진행합니다.  
+
+경로를 `~/3dv_tutorial$`로 바꾼후,  
+```
+mkdir build
+cd build
+cmake ..
+make -j4
+make install
+```
+
+빌드가 완료되면 `bin` 폴더에 여러 실행파일이 생긴 것을 볼 수가 있습니다.  
+
+이제 터미널에서 실행을 시키면 됩니다!  
+
+ex) `./vo_epipolar`  
+
+
+
+
+---
+
+## Original Readme.md
+
 ## An Invitation to 3D Vision: A Tutorial for Everyone
 _An Invitation to 3D Vision_ is an introductory tutorial on 3D vision (a.k.a. geometric vision or visual geometry or multi-view geometry).
 It aims to make beginners understand basic theory of 3D vision and implement their own applications using [OpenCV][].
