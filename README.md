@@ -38,7 +38,7 @@ make install
 Ceres-solver는 버전 2가 넘어가면 안된다는 Issue가 있었습니다.  
 
 
-### Build this repository  
+### 2. Build this repository  
 
 필요한 라이브러리를 다 받으면 이 repository에 있는 `CMakeLists.txt`를 다음과 같이 수정해주어야 합니다.  
 
